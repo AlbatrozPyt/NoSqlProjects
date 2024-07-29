@@ -34,6 +34,35 @@ namespace MinimalApi.Controllers
             }
         }
 
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Product>> GetById(string id)
+        {
+            try
+            {
+
+                // Forma simples
+                // var product = await _product.Find("lambda").FirstOrDefautAsync()
+
+                // Cria um filtro para a busca
+                var filter = Builders<Product>.Filter.Eq(x => x.Id, id);
+                var res = await _product.Find(filter).ToListAsync();
+
+                if (res != null)
+                {
+                    return Ok(res.First());
+                }
+
+                return NotFound();
+
+            }
+            catch (Exception)
+            {
+
+                return NotFound();
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult<Product>> Post(Product product)
         {
@@ -54,23 +83,26 @@ namespace MinimalApi.Controllers
             }
         }
 
-
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(string id)
         {
             try
             {
                 var res = await _product.DeleteOneAsync(x => x.Id == id);
 
-                return Ok(res);
+                if (res.DeletedCount == 1)
+                {
+                    return Ok("O produto foi encontrado");
+                }
+
+                return NotFound("Nenhum produto encontrado");
+
             }
             catch (Exception)
             {
                 return NotFound();
             }
         }
-
-
 
         [HttpPut]
         public async Task<ActionResult<Product>> Update(string id, Product product)
@@ -110,21 +142,5 @@ namespace MinimalApi.Controllers
             }
         }
 
-        [HttpGet("Id")]
-        public async Task<ActionResult<Product>> GetById(string id)
-        {
-            try
-            {
-                var filter = Builders<Product>.Filter.Eq(x => x.Id, id);
-                var res = await _product.Find(filter).ToListAsync();
-
-                return Ok(res.First());
-            }
-            catch (Exception)
-            {
-
-                return NotFound();
-            }
-        }
     }
 }
