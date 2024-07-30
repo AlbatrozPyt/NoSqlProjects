@@ -9,17 +9,28 @@ namespace MinimalApi.Domains
         public string? Id { get; set; }
 
         [BsonElement("Date")]
-        public DateOnly? Date { get; set;}
+        public DateOnly? Date { get; set; }
 
         [BsonElement("Status")]
-        public bool? Status { get; set;}
-
-        [BsonElement("ProductId"), BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
-        public List<string>? ProdcutId { get; set;}
+        public bool? Status { get; set; }
 
 
-        [BsonElement("ClientId"), BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
+        // referencia dos produtos
+
+        [BsonElement("ProductId")]
+        public List<string>? ProductId { get; set; }
+
+        public List<Product>? Products { get; set; }
+
+
+        // referencia do cliente
+
+        [BsonElement("ClientId")]
         public string? ClientId { get; set; }
+
+        public Client? Client { get; set; }
+
+
 
 
     }

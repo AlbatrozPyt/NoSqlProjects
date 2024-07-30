@@ -8,7 +8,7 @@ namespace MinimalApi.Domains
         [BsonElement("_id"), BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
         public string? Id { get; set; }
 
-        [BsonElement("User_id"), BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
+        [BsonElement("User_id")]
         public string? UserId { get; set; }
 
 
