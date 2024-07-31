@@ -16,7 +16,7 @@ namespace MinimalApi.Controllers
 
         public ProductController(MongoDbService mongoDbService)
         {
-            _product = mongoDbService.GetDatabase.GetCollection<Product>("product");
+            _product = mongoDbService.GetDatabase.GetCollection<Product>("Product");
         }
 
         [HttpGet]

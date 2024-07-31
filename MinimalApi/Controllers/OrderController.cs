@@ -20,16 +20,33 @@ namespace MinimalApi.Controllers
         {
             _order = mongoDbService.GetDatabase.GetCollection<Order>("Order");
             _client = mongoDbService.GetDatabase.GetCollection<Client>("Client");
-            _product = mongoDbService.GetDatabase.GetCollection<Product>("product");
+            _product = mongoDbService.GetDatabase.GetCollection<Product>("Product");
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Order>>> Get()
+        public async Task<ActionResult> Get()
         {
             try
             {
+                var listGetOrder = new List<GetOrderViewModel>();
+
                 var res = _order.Find(FilterDefinition<Order>.Empty).ToList();
-                return Ok(res);
+
+                foreach (var item in res)
+                {
+                    GetOrderViewModel getOrder = new GetOrderViewModel()
+                    {
+                        Id = item.Id,
+                        Client = item.Client,
+                        Date = item.Date, 
+                        Status = item.Status == true ? "Pedido entregue" : "Pedido pendente",
+                        Products = item.Products
+                    };
+
+                    listGetOrder.Add(getOrder);
+                }
+
+                return Ok(listGetOrder.ToList());
             }
             catch (Exception e)
             {
@@ -103,7 +120,7 @@ namespace MinimalApi.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPut("{orderId}")]
         public async Task<ActionResult> Put(Order order, string orderId)
         {
             try
@@ -163,7 +180,7 @@ namespace MinimalApi.Controllers
             }
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(string id)
         {
             try

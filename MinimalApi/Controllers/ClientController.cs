@@ -24,10 +24,9 @@ namespace MinimalApi.Controllers
         {
             try
             {
+                await _client!.InsertOneAsync(client);
 
-                await _client.InsertOneAsync(client);
-
-                return Ok(client);
+                return Created();
             }
             catch (Exception e)
             {
@@ -53,10 +52,14 @@ namespace MinimalApi.Controllers
         {
             try
             {
-                var filter = Builders<Client>.Filter.Eq(x => x.Id, id);
-                var obj = await _client.FindAsync(filter);
+                Client obj = await _client.Find(x => x.Id == id).FirstOrDefaultAsync();
 
-                return Ok(obj.First());
+                if (obj == null)
+                {
+                    return NotFound("Nenhum cliente foi encontrado com esse Id !!!"); 
+                }
+
+                return Ok(obj);
             }
             catch (Exception e)
             {
@@ -64,12 +67,18 @@ namespace MinimalApi.Controllers
             }
         }
 
-        [HttpPut]
-        public async Task<ActionResult> Update(Client client)
+        [HttpPut("{clientId}")]
+        public async Task<ActionResult> Update(Client client, string clientId)
         {
             try
             {
-                var update = await _client.ReplaceOneAsync(x => x.Id == client.Id, client);
+                Client client1 = await _client.Find(x => x.Id == clientId).FirstOrDefaultAsync();
+                client1.Cpf = client.Cpf != null ? client.Cpf : client1.Cpf;
+                client1.Phone = client.Phone != null ? client.Phone : client1.Phone;
+                client1.Address = client.Address != null ? client.Address : client1.Address;
+                client1.AdditionalAtributes = client.AdditionalAtributes != null ? client.AdditionalAtributes : client1.AdditionalAtributes;
+
+                var update = await _client.ReplaceOneAsync(x => x.Id == client.Id, client1);
 
                 return Ok("Cliente atualizado com sucesso");
             }
@@ -79,14 +88,20 @@ namespace MinimalApi.Controllers
             }
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(string id)
         {
             try
             {
-                await _client.DeleteOneAsync(x => x.Id == id);
+                Client client1 = await _client.Find(x => x.Id == id).FirstOrDefaultAsync();
 
-                return NoContent();
+                if(client1 != null)
+                {
+                    await _client.DeleteOneAsync(x => x.Id == id);
+                    return NoContent();
+                }
+
+                return NotFound("Nao foi encontrado nenhum Cliente com esse Id");
             }
             catch (Exception e)
             {
